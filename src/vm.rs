@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+
 use crate::decode::{Instruction, decode};
 use std::io::{self, Write};
 

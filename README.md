@@ -2,7 +2,7 @@
 
 Rupture is a small, self-modifying esoteric programming language written in Rust. Code and data share the same 64 KiB of memory, meaning programs can overwrite their own instructions while running.
 
-It's designed to be usable, but unnecessarily painful to program in.
+It's usable, but its painful to program in
 
 ## Instructions
 
