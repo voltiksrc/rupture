@@ -46,3 +46,8 @@ Example:
 - Jump addresses are byte offsets, not line numbers.
 - Invalid instructions result in an error.
 - There are no comments.
+
+## License
+
+Rupture is licensed under the GNU General Public License v3.0 or later.
+See [LICENSE](LICENSE) for details.
