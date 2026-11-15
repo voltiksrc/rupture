@@ -7,6 +7,7 @@ pub enum Instruction {
     MoveLeft,
     LoopStart,
     LoopEnd,
+    PrintNumber,
     Halt,
     Copy(usize, usize),
     Jump(usize),
@@ -33,6 +34,10 @@ pub fn decode(memory: &[u8], pc: usize) -> Result<(Instruction, usize), String> 
 
     if memory.get(pc..pc + 4) == Some(b"41C5".as_slice()) {
         return Ok((Instruction::Halt, 4));
+    }
+
+    if memory.get(pc..pc + 4) == Some(b"#999".as_slice()) {
+        return Ok((Instruction::PrintNumber, 4));
     }
 
     if memory.get(pc) == Some(&b'[') {

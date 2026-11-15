@@ -61,6 +61,10 @@ impl Vm {
                 // Flush to make the output appear immediately
                 io::stdout().flush().map_err(|e| e.to_string())?;
             }
+            Instruction::PrintNumber => {
+                print!("{}", self.memory[self.mp]);
+                io::stdout().flush().map_err(|e| e.to_string())?;
+            }
             Instruction::Copy(source, destination) => {
                 let byte = *self.memory.get(source).ok_or("Invalid source address")?;
 
