@@ -8,6 +8,9 @@ pub enum Instruction {
     LoopStart,
     LoopEnd,
     PrintNumber,
+    Input,
+    Comment,
+    Whitespace,
     Halt,
     Copy(usize, usize),
     Jump(usize),
@@ -16,6 +19,10 @@ pub enum Instruction {
 }
 
 pub fn decode(memory: &[u8], pc: usize) -> Result<(Instruction, usize), String> {
+    if memory[pc].is_ascii_whitespace() {
+        return Ok((Instruction::Whitespace, 1));
+    }
+
     if memory.get(pc..pc + 3) == Some(b"%++".as_slice()) {
         return Ok((Instruction::Increment, 3));
     }
@@ -38,6 +45,21 @@ pub fn decode(memory: &[u8], pc: usize) -> Result<(Instruction, usize), String> 
 
     if memory.get(pc..pc + 4) == Some(b"#999".as_slice()) {
         return Ok((Instruction::PrintNumber, 4));
+    }
+
+    if memory.get(pc..pc + 3) == Some(b"?IN".as_slice()) {
+        return Ok((Instruction::Input, 3));
+    }
+
+    if memory.get(pc..pc + 2) == Some(b"^^".as_slice()) {
+        let remaining = &memory[pc + 2..];
+
+        let end = remaining
+            .windows(2)
+            .position(|pair| pair == b"^^")
+            .ok_or("Unfinished comment '^^'")?;
+
+        return Ok((Instruction::Comment, 2 + end + 2));
     }
 
     if memory.get(pc) == Some(&b'[') {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 use crate::decode::{Instruction, decode};
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 
 pub struct Vm {
     memory: Vec<u8>,
@@ -64,6 +64,14 @@ impl Vm {
             Instruction::PrintNumber => {
                 print!("{}", self.memory[self.mp]);
                 io::stdout().flush().map_err(|e| e.to_string())?;
+            }
+            Instruction::Input => {
+                let mut buffer = [0u8; 1];
+                io::stdin()
+                    .read_exact(&mut buffer)
+                    .map_err(|err| err.to_string())?;
+
+                self.memory[self.mp] = buffer[0];
             }
             Instruction::Copy(source, destination) => {
                 let byte = *self.memory.get(source).ok_or("Invalid source address")?;
@@ -134,6 +142,10 @@ impl Vm {
                     return Err("Unmatched closing loop bracket ']'".into());
                 }
             }
+            Instruction::Comment => {}
+
+            Instruction::Whitespace => {}
+
             Instruction::Halt => {
                 self.halted = true;
             }
