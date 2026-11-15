@@ -1,22 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-
-pub enum Instruction {
-    Increment,
-    Decrement,
-    MoveRight,
-    MoveLeft,
-    LoopStart,
-    LoopEnd,
-    PrintNumber,
-    Input,
-    Comment,
-    Whitespace,
-    Halt,
-    Copy(usize, usize),
-    Jump(usize),
-    JumpIfZero(usize),
-    Print(String),
-}
+use crate::instructions::Instruction;
 
 pub fn decode(memory: &[u8], pc: usize) -> Result<(Instruction, usize), String> {
     if memory[pc].is_ascii_whitespace() {

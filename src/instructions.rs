@@ -1,0 +1,17 @@
+pub enum Instruction {
+    Increment,
+    Decrement,
+    MoveRight,
+    MoveLeft,
+    LoopStart,
+    LoopEnd,
+    PrintNumber,
+    Input,
+    Whitespace,
+    Comment,
+    Halt,
+    Copy(usize, usize),
+    Jump(usize),
+    JumpIfZero(usize),
+    Print(String),
+}

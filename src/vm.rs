@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 
-use crate::decode::{Instruction, decode};
+use crate::decode::decode;
+use crate::instructions::Instruction;
+
 use std::io::{self, Read, Write};
 
 pub struct Vm {
