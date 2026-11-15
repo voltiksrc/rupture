@@ -79,11 +79,60 @@ impl Vm {
                 self.pc = address;
                 return Ok(());
             }
+            Instruction::JumpIfZero(address) => {
+                if self.memory[self.mp] == 0 {
+                    if address >= self.memory.len() {
+                        return Err("Jump address out of bounds".into());
+                    }
+
+                    self.pc = address;
+                    return Ok(());
+                }
+            }
+            Instruction::LoopStart => {
+                if self.memory[self.mp] == 0 {
+                    let mut depth = 1;
+
+                    for (address, &byte) in self.memory.iter().enumerate().skip(self.pc + 1) {
+                        match byte {
+                            b'[' => depth += 1,
+                            b']' => depth -= 1,
+                            _ => {}
+                        }
+
+                        if depth == 0 {
+                            self.pc = address + 1;
+                            return Ok(());
+                        }
+                    }
+
+                    // Only reached if no matching bracket was found.
+                    return Err("Unmatched opening loop bracket '['".into());
+                }
+            }
+            Instruction::LoopEnd => {
+                if self.memory[self.mp] != 0 {
+                    let mut depth = 1;
+
+                    for (address, &byte) in self.memory[..self.pc].iter().enumerate().rev() {
+                        match byte {
+                            b']' => depth += 1,
+                            b'[' => depth -= 1,
+                            _ => {}
+                        }
+
+                        if depth == 0 {
+                            self.pc = address;
+                            return Ok(());
+                        }
+                    }
+
+                    return Err("Unmatched closing loop bracket ']'".into());
+                }
+            }
             Instruction::Halt => {
                 self.halted = true;
             }
-
-            _ => return Err("Instruction not implemented yet.".into()),
         }
 
         self.pc += length;

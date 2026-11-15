@@ -5,6 +5,8 @@ pub enum Instruction {
     Decrement,
     MoveRight,
     MoveLeft,
+    LoopStart,
+    LoopEnd,
     Halt,
     Copy(usize, usize),
     Jump(usize),
@@ -31,6 +33,14 @@ pub fn decode(memory: &[u8], pc: usize) -> Result<(Instruction, usize), String> 
 
     if memory.get(pc..pc + 4) == Some(b"41C5".as_slice()) {
         return Ok((Instruction::Halt, 4));
+    }
+
+    if memory.get(pc) == Some(&b'[') {
+        return Ok((Instruction::LoopStart, 1));
+    }
+
+    if memory.get(pc) == Some(&b']') {
+        return Ok((Instruction::LoopEnd, 1));
     }
 
     if memory.get(pc..pc + 5) == Some(b"^777<".as_slice()) {
@@ -86,6 +96,22 @@ pub fn decode(memory: &[u8], pc: usize) -> Result<(Instruction, usize), String> 
         let address = args.parse::<usize>().map_err(|_| "Invalid address")?;
 
         return Ok((Instruction::Jump(address), 2 + end + 1));
+    }
+
+    if memory.get(pc..pc + 5) == Some(b"?0-:{".as_slice()) {
+        let remaining = &memory[pc + 5..];
+
+        let end = remaining
+            .iter()
+            .position(|&byte| byte == b'}')
+            .ok_or("Unterminated jump if zero instruction")?;
+
+        let args = std::str::from_utf8(&remaining[..end])
+            .map_err(|_| "Invalid UTF-8 in jump instruction")?;
+
+        let address = args.parse::<usize>().map_err(|_| "Invalid address")?;
+
+        return Ok((Instruction::JumpIfZero(address), 5 + end + 1));
     }
 
     Err(format!("Unknown instruction at address {}", pc))
