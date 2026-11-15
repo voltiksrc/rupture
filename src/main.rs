@@ -1,21 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0
 
-mod decode;
 #[cfg(test)]
 mod tests;
+
+mod cli;
+mod decode;
+mod instructions;
 mod vm;
 
-use std::{env, fs};
+use std::fs;
 use vm::Vm;
 
 fn main() -> Result<(), String> {
-    let path = env::args().nth(1).ok_or("Usage rupture <file.rp>")?;
+    match cli::parse()? {
+        cli::Command::Help => cli::help(),
+        cli::Command::Version => cli::version(),
+        cli::Command::Run(path) => {
+            let source =
+                fs::read(&path).map_err(|err| format!("Failed to read '{}': {}", path, err))?;
 
-    let source = fs::read(&path).map_err(|err| format!("Failed to read '{}': {}", path, err))?;
-
-    let mut vm = Vm::new(&source)?;
-
-    vm.run()?;
+            let mut vm = Vm::new(&source)?;
+            vm.run()?;
+        }
+    }
 
     Ok(())
 }
