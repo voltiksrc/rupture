@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 
 mod decode;
+#[cfg(test)]
+mod tests;
 mod vm;
 
 use std::{env, fs};
